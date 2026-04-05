@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CUET Mock Test</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: #eef2f7;
+  padding: 20px;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+h2 { text-align: center; }
+
+.timer {
+  text-align: right;
+  font-size: 18px;
+  color: red;
+}
+
+.question {
+  margin-bottom: 20px;
+}
+
+button {
+  padding: 12px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.result-box {
+  margin-top: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.correct { color: green; }
+.wrong { color: red; }
+
+/* 📱 MOBILE RESPONSIVE */
+@media (max-width: 600px) {
+  body { padding: 10px; }
+
+  .container { padding: 15px; }
+
+  .question p {
+    font-size: 16px;
+  }
+
+  input[type="radio"] {
+    transform: scale(1.2);
+    margin-right: 8px;
+  }
+
+  button {
+    width: 100%;
+    font-size: 16px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h2>CUET Political Science Mock Test</h2>
+
+<div class="timer">
+⏱ Time Left: <span id="time">50:00</span>
+</div>
+
+<form id="quizForm"></form>
+
+<button onclick="submitTest()">Submit</button>
+
+<div class="result-box" id="result"></div>
+</div>
+
+<script>
+
+// QUESTIONS (53)
+const questions = [
+["क्योटो प्रोटोकॉल कब हस्ताक्षरित हुआ था?","a","b","c","d","c"],
+["START का पूर्ण रूप क्या है?","a","b","c","d","b"],
+["वैश्विक सुरक्षा के लिए खतरा?","a","b","c","d","b"],
+["अंबेडकर जयंती कब?","a","b","c","d","d"],
+["UN की स्थापना किसके बाद?","a","b","c","d","a"],
+["UNDP full form?","a","b","c","d","a"],
+["Seven Sisters?","a","b","c","d","b"],
+["नागालैंड कब बना?","a","b","c","d","b"],
+["दो राष्ट्र सिद्धांत?","a","b","c","d","b"],
+["Frontier Gandhi?","a","b","c","d","c"],
+["Milkman of India?","a","b","c","d","b"],
+["द्वितीय योजना?","a","b","c","d","b"],
+["India rejected treaty?","a","b","c","d","a"],
+["NAM पहला सम्मेलन?","a","b","c","d","a"],
+["शिमला समझौता?","a","b","c","d","c"],
+["Non-Congressism?","a","b","c","d","a"],
+["मंडल आयोग?","a","b","c","d","b"],
+["Railway strike 1974?","a","b","c","d","b"],
+["BSP founder?","a","b","c","d","b"],
+["Shock Therapy?","a","b","c","d","c"],
+["Assertion Reason?","a","b","c","d","c"],
+["उत्तर-पूर्व समस्या?","a","b","c","d","b"],
+["उत्तर-पूर्व gateway?","a","b","c","d","b"],
+
+["ASEAN कब बना?","a","b","c","d","c"],
+["WTO का कार्य?","a","b","c","d","b"],
+["Globalization?","a","b","c","d","b"],
+["NATO कब बना?","a","b","c","d","c"],
+["Kyoto Protocol?","a","b","c","d","b"],
+["Agenda 21?","a","b","c","d","b"],
+["Cold War?","a","b","c","d","b"],
+["IMF कार्य?","a","b","c","d","b"],
+["Chipko Movement?","a","b","c","d","c"],
+["विदेश नीति आधार?","a","b","c","d","b"],
+
+["Open Door Policy?","a","b","c","d","b"],
+["Perestroika किससे?","a","b","c","d","c"],
+["CIS कब बना?","a","b","c","d","c"],
+["SAFTA full form?","a","b","c","d","a"],
+["Shock Therapy country?","a","b","c","d","c"],
+["Narmada आंदोलन?","a","b","c","d","b"],
+["Dalit Panthers?","a","b","c","d","b"],
+["Panchsheel?","a","b","c","d","b"],
+["Bandung Conference?","a","b","c","d","a"],
+["NAM उद्देश्य?","a","b","c","d","b"],
+
+["League of Nations कब बना?","a","b","c","d","a"],
+["UN Day कब?","a","b","c","d","c"],
+["General Assembly?","a","b","c","d","c"],
+["Security Council members?","a","b","c","d","b"],
+["EU currency?","a","b","c","d","c"],
+["Shock Therapy उद्देश्य?","a","b","c","d","b"],
+["Global Commons?","a","b","c","d","c"],
+["World Social Forum?","a","b","c","d","c"],
+["Deterrence?","a","b","c","d","b"],
+["Disarmament?","a","b","c","d","b"]
+];
+
+// OPTIONS (same order)
+const optionText = [
+["1992","1995","1997","1999"],
+["Toll","Treaty","Tax","Tactics"],
+["मानव अधिकार","आतंकवाद","निरस्त्रीकरण","शांति"],
+["14 जनवरी","14 फरवरी","14 मार्च","14 अप्रैल"],
+["लीग","काउंसिल","G20","NATO"],
+["Development Programme","Design","Planning","News"],
+["दक्षिण","उत्तर-पूर्व","पश्चिम","उत्तर"],
+["1961","1963","1965","1967"],
+["कांग्रेस","मुस्लिम लीग","समाजवादी","भाजपा"],
+["गांधी","पटेल","गफ्फार खान","नेहरू"],
+["स्वामीनाथन","कुरियन","अरुण","पटेल"],
+["कृषि","भारी उद्योग","शिक्षा","स्वास्थ्य"],
+["NPT","START","INF","CTBT"],
+["बेलग्रेड","दिल्ली","काठमांडू","जिनेवा"],
+["नेपाल","चीन","पाकिस्तान","बांग्लादेश"],
+["लोहिया","इंदिरा","करुणानिधि","कर्पूरी"],
+["कांग्रेस","जनता पार्टी","भाजपा","समाजवादी"],
+["जेपी","फर्नांडिस","इंदिरा","चारू"],
+["मायावती","कांशीराम","अंबेडकर","राम"],
+["भारत","चीन","रूस","अमेरिका"],
+["दोनों","दोनों गलत","A सही","A गलत"],
+["शिक्षा","प्रवासन","उद्योग","तकनीक"],
+["यूरोप","दक्षिण-पूर्व एशिया","अमेरिका","अफ्रीका"],
+
+["1965","1966","1967","1968"],
+["युद्ध","व्यापार","शिक्षा","पर्यावरण"],
+["आर्थिक","जुड़ाव","संस्कृति","व्यापार"],
+["1945","1947","1949","1952"],
+["युद्ध","पर्यावरण","व्यापार","शिक्षा"],
+["क्योटो","रियो","स्टॉकहोम","पेरिस"],
+["भारत","अमेरिका-USSR","जापान","फ्रांस"],
+["युद्ध","आर्थिक सहायता","शिक्षा","पर्यावरण"],
+["महिला","किसान","पर्यावरण","मजदूर"],
+["युद्ध","गुटनिरपेक्ष","व्यापार","उपनिवेश"],
+
+["भारत","चीन","अमेरिका","जापान"],
+["लेनिन","स्टालिन","गोर्बाचेव","येल्त्सिन"],
+["WW1","WW2","USSR collapse","Cold war"],
+["SAFTA","Trade","Finance","Agency"],
+["भारत","चीन","रूस","जापान"],
+["किसान","पर्यावरण","महिला","मजदूर"],
+["पर्यावरण","जाति","शिक्षा","व्यापार"],
+["भारत-अमेरिका","भारत-चीन","भारत-रूस","भारत-नेपाल"],
+["NAM","NATO","WTO","IMF"],
+["युद्ध","गुटनिरपेक्ष","व्यापार","उपनिवेश"],
+
+["1919","1925","1930","1945"],
+["20","22","24","26"],
+["IMF","WTO","UN","NATO"],
+["4","5","6","7"],
+["Dollar","Pound","Euro","Yen"],
+["युद्ध","अर्थव्यवस्था बदलना","शिक्षा","पर्यावरण"],
+["निजी","सरकारी","मानवता","देश"],
+["व्यापार","सैन्य","वैश्वीकरण विरोध","शिक्षा"],
+["युद्ध","रोकना","व्यापार","सहयोग"],
+["हथियार बढ़ाना","कम/समाप्त","युद्ध","सेना"]
+];
+
+// RENDER
+let form=document.getElementById("quizForm");
+questions.forEach((q,i)=>{
+let html=`<div class="question"><p>${i+1}. ${q[0]}</p>`;
+optionText[i].forEach((opt,j)=>{
+html+=`<input type="radio" name="q${i}" value="${["a","b","c","d"][j]}"> ${opt}<br>`;
+});
+html+=`</div>`;
+form.innerHTML+=html;
+});
+
+// TIMER (50 minutes)
+let time=3000;
+let timer=setInterval(()=>{
+let m=Math.floor(time/60),s=time%60;
+document.getElementById("time").innerText=`${m}:${s<10?"0":""}${s}`;
+time--;
+if(time<0){clearInterval(timer);submitTest();}
+},1000);
+
+// MARKING
+const totalMarks=250;
+const perQ=totalMarks/questions.length;
+
+// SUBMIT
+function submitTest(){
+let score=0,attempted=0,wrong=0,html="";
+questions.forEach((q,i)=>{
+let sel=document.querySelector(`input[name=q${i}]:checked`);
+if(sel){
+attempted++;
+if(sel.value===q[5]){
+score+=perQ;
+html+=`<p class="correct">Q${i+1} ✔</p>`;
+}else{
+score-=1;
+wrong++;
+html+=`<p class="wrong">Q${i+1} ❌ (Ans: ${q[5]})</p>`;
+}}});
+let acc=attempted?((attempted-wrong)/attempted*100).toFixed(2):0;
+document.getElementById("result").innerHTML=`
+<h3>📊 Result</h3>
+Total: ${totalMarks}<br>
+Attempted: ${attempted}<br>
+Correct: ${attempted-wrong}<br>
+Wrong: ${wrong}<br>
+Score: ${score.toFixed(2)}<br>
+Accuracy: ${acc}%<hr>${html}`;
+clearInterval(timer);
+}
+</script>
+
+</body>
+</html>
